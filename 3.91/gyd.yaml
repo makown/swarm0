@@ -1,0 +1,61 @@
+version: '3'
+services:
+  gyd_mgt:
+    image: registry.cn-shenzhen.aliyuncs.com/epipepro/gyd_mgt
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == test01
+    ports:
+      - '82:8080'
+    volumes:
+      - gyd_mgt_logs:/usr/local/tomcat/logs
+  gyd_api:
+    image: registry.cn-shenzhen.aliyuncs.com/epipepro/gyd_member
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == test01
+    ports:
+      - '18082:8080'
+    volumes:
+      - gyd_api_logs:/usr/local/tomcat/logs
+ 
+  gyd_service:
+    image: registry.cn-shenzhen.aliyuncs.com/epipepro/gyd_service
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == test01
+    volumes:
+      - gyd_service_logs:/usr/local/tomcat/logs
+     
+
+
+networks:
+  default:
+    external:
+      name: basic
+
+volumes:
+  gyd_mgt_logs:
+  gyd_api_logs:
+  gyd_service_logs:

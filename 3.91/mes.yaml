@@ -1,0 +1,61 @@
+version: '3'
+services:
+  mes_mgt:
+    image: registry.cn-shenzhen.aliyuncs.com/epipepro/mes_mgt
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == test01
+    ports:
+      - '81:8080'
+    volumes:
+      - mes_mgt_logs:/usr/local/tomcat/logs
+  mes_api:
+    image: registry.cn-shenzhen.aliyuncs.com/epipepro/mes_member
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == test01
+    ports:
+      - '18081:8080'
+    volumes:
+      - mes_api_logs:/usr/local/tomcat/logs
+ 
+  mes_service:
+    image: registry.cn-shenzhen.aliyuncs.com/epipepro/mes_service
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == test01
+    volumes:
+      - mes_service_logs:/usr/local/tomcat/logs
+     
+
+
+networks:
+  default:
+    external:
+      name: basic
+
+volumes:
+  mes_mgt_logs:
+  mes_api_logs:
+  mes_service_logs:
